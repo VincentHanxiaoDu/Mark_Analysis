@@ -1,0 +1,38 @@
+---
+title: "Mark Analysis"
+author: "Hanxiao Du"
+output: pdf_document
+---
+
+#An analysis of my marks throughout all semesters in university.
+
+## Visualization
+```{r message=FALSE}
+library(dplyr)
+library(ggplot2)
+# read marks from csv
+all_courses = read.csv("marks.csv")
+# remove courses with unknown marks
+marks = all_courses[!is.na(all_courses$Mark),]
+# histogram of all marks
+ggplot(marks, aes(x=Mark)) + geom_histogram(binwidth = 5)
+# boxplot for each term
+ggplot(marks, aes(x=as.factor(Term), y=Mark)) + geom_boxplot() + xlab("Term") + ylab("Mark")
+
+terms = marks %>% group_by(Term) %>% summarise(AverageMark=mean(Mark))
+# scatterplot of average mark of terms
+ggplot(terms, aes(x=Term, y=AverageMark)) + geom_point() +
+  geom_smooth(formula=y~x, method="lm")
+```
+
+```{r}
+cor(terms$AverageMark, terms$Term)
+```
+
+## Regression Analysis
+```{r}
+linear_model = lm(AverageMark~Term, data=terms)
+summary(linear_model)
+```
+
+
